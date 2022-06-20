@@ -12,6 +12,13 @@ spec:
       labels:
         app: todo
     spec:
+      volumes: # Define volume
+        - name: todo-image
+          persistentVolumeClaim:
+            claimName: todo-claim
       containers:
         - name: todo
-          image: ddeeh/k8s_todo_105
+          image: ddeeh/k8s_todo_112
+          volumeMounts: # Mount volume
+          - name: todo-image
+            mountPath: /usr/app/media

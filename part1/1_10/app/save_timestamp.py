@@ -6,7 +6,7 @@ def save_timestamp():
     """Saves timestamp to file every 5 seconds"""
     timestamp = datetime.datetime.now()
     threading.Timer(5.0, save_timestamp).start()
-    with open('timestamp.txt', 'w') as f:
+    with open('files/timestamp.txt', 'w') as f:
         print('saving timestamp...')
         f.write(f'timestamp: {timestamp}')
 

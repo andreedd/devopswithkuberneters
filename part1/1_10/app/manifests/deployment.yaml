@@ -1,28 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: log-dep
+  name: log-output
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: log
+      app: log-output
   template:
     metadata:
       labels:
-        app: log
+        app: log-output
     spec:
       volumes: # Define volume
-        - name: shared-log
+        - name: shared-image
           emptyDir: {}
       containers:
-        - name: log-timestamp
-          image: ddeeh/k8s_log_timestamp
-          volumeMounts: # Mount volume
-          - name: shared-log
-            mountPath: /usr/app
         - name: log-output
           image: ddeeh/k8s_log_output
           volumeMounts: # Mount volume
-          - name: shared-log
-            mountPath: /usr/app
+          - name: shared-image
+            mountPath: /usr/app/files
+        - name: log-timestamp
+          image: ddeeh/k8s_log_timestamp
+          volumeMounts: # Mount volume
+          - name: shared-image
+            mountPath: /usr/app/files

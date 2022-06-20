@@ -15,9 +15,12 @@ def request_logs():
 
 def output_logs():
     """Output random string with timestamp"""
-    with open('timestamp.txt', 'r') as f:
-        timestamp = f.read()
-    logs = f'timestamp: {timestamp} string: ' + ''.join(random.choice(letters) for i in range(20))
+    try:
+        with open('files/timestamp.txt', 'r') as f:
+            timestamp = f.read()
+        logs = f'timestamp: {timestamp} string: ' + ''.join(random.choice(letters) for i in range(20))
+    except FileNotFoundError:
+        logs = 'No timestamps found'
     return logs
 
 
