@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: todo-app
+  name: todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      volumes: # Define volume
+        - name: todo-image
+          persistentVolumeClaim:
+            claimName: todo-claim
+      containers:
+        - name: todo
+          image: ddeeh/k8s_todo
+          command: ["/bin/sh"]
+          args: ["-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+          volumeMounts: # Mount volume
+          - name: todo-image
+            mountPath: /usr/app/media
+          env:
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: POSTGRES_USERNAME
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: POSTGRES_PASSWORD
