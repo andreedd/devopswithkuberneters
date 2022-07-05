@@ -39,7 +39,7 @@ def todos(request):
             Todo(title=todo).save()
             print(f'added todo: {todo}')
         except:
-            print('Error: Todo too long')
+            print('todo too long')
         todos = list(Todo.objects.all().values('title', 'id'))
         return JsonResponse({'data': todos})
     todos = list(Todo.objects.all().values('title', 'id'))
