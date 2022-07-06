@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: log-app
+  name: log-output
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output
+  template:
+    metadata:
+      labels:
+        app: log-output
+    spec:
+      volumes: # Define volume
+        - name: shared-image
+          emptyDir: {}
+      containers:
+        - name: log-output
+          image: ddeeh/k8s_log_output
+          env:
+          - name: MESSAGE
+            valueFrom:
+              configMapKeyRef:
+                name: message-config
+                key: message
+          volumeMounts: # Mount volume
+          - name: shared-image
+            mountPath: /usr/app/files
+        - name: log-timestamp
+          image: ddeeh/k8s_log_timestamp
+          volumeMounts: # Mount volume
+          - name: shared-image
+            mountPath: /usr/app/files
