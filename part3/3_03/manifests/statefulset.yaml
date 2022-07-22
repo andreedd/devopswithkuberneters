@@ -17,8 +17,6 @@ spec:
         - name: postgres
           image: postgres
           env:
-          - name: POSTGRES_USERNAME
-            value: ${{ secrets.POSTGRES_USERNAME }}
           - name: POSTGRES_PASSWORD
             value: ${{ secrets.POSTGRES_PASSWORD }}
           - name: PGDATA
