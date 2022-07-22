@@ -9,6 +9,8 @@ env:
   GKE_ZONE: europe-north1-c
   BACKEND_IMAGE: backend
   FRONTEND_IMAGE: frontend
+  POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
 jobs:
   build-publish-deploy:
@@ -51,7 +53,6 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v1
       - name: Deploy
-
         run: |-
           cd part3/3_03
           kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
