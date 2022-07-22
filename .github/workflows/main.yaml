@@ -55,6 +55,7 @@ jobs:
       - name: Deploy
         run: |-
           cd part3/3_03
+          echo $POSTGRES_USERNAME
           kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize edit set image gcr.io/PROJECT_ID/FRONTEND_IMAGE=gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kubectl config set-context --current --namespace=todo-app
