@@ -1,0 +1,16 @@
+gcloud auth login
+
+gcloud config set project integral-surfer-354805
+
+gcloud container clusters create dwk-cluster --zone=europe-north1-c --cluster-version=1.22
+
+kubectl create namespace todo-app
+
+kubectl config set-context --current --namespace=todo-app
+
+kubectl apply -f app/manifests/
+
+
+
+
+gcloud container clusters delete dwk-cluster --zone=europe-north1-c
