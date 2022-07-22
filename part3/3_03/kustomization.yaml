@@ -10,6 +10,7 @@ resources:
   - manifests/namespaces.yaml
   - manifests/statefulset.yaml
   - manifests/todojob.yaml
+  - manifests/secret.yaml
 images:
   - name: PROJECT/BACKEND_IMAGE
     newName: ddeeh/k8s_todo

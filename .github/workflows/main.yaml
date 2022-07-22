@@ -26,6 +26,12 @@ jobs:
           project_id: ${{ secrets.GKE_PROJECT }}
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           export_default_credentials: true
+
+      - name: Sops Binary Installer
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: 'default' # default is latest stable
+        id: install
       
 
       - run: gcloud --quiet auth configure-docker
@@ -49,13 +55,9 @@ jobs:
         run: |-
           docker push "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
 
-      - name: Sops Binary Installer
-        uses: mdgreenwald/mozilla-sops-action@v1.2.0
-        with:
-          version: 'default' # default is latest stable
-        id: install
+      - name: setup sops
         run: |-
-          sops --decrypt secret.enc.yaml > secret.yaml
+          sops --decrypt part3/3_03/manifests/secret.enc.yaml > part3/3_03/manifests/secret.yaml
 
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v1
