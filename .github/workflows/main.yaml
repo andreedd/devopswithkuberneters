@@ -9,9 +9,8 @@ env:
   GKE_ZONE: europe-north1-c
   BACKEND_IMAGE: backend
   FRONTEND_IMAGE: frontend
-  POSTGRES_PASSWORD_TEST: ${{ secrets.POSTGRES_PASSWORD }}
-  POSTGRES_USERNAME: postgres
-  POSTGRES_PASSWORD: example
+  POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
 jobs:
   build-publish-deploy:
@@ -56,8 +55,6 @@ jobs:
       - name: Deploy
         run: |-
           cd part3/3_03
-          echo "secret: $POSTGRES_PASSWORD_TEST"
-          echo "MY CLUSTER: $GKE_CLUSTER"
           kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize edit set image gcr.io/PROJECT_ID/FRONTEND_IMAGE=gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kubectl config set-context --current --namespace=todo-app
