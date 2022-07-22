@@ -9,8 +9,7 @@ env:
   GKE_ZONE: europe-north1-c
   BACKEND_IMAGE: backend
   FRONTEND_IMAGE: frontend
-  POSTGRES_UNAME: ${{ secrets.POSTGRES_USERNAME }}
-  POSTGRES_PASS: ${{ secrets.POSTGRES_PASSWORD }}
+  SOPS_AGE_KEY_FILE: ${{ secrets.SOPS_KEY_FILE }}
 
 jobs:
   build-publish-deploy:
@@ -50,13 +49,19 @@ jobs:
         run: |-
           docker push "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
 
+      - name: Sops Binary Installer
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: 'default' # default is latest stable
+        id: install
+        run: |-
+          sops --decrypt secret.enc.yaml > secret.yaml
+
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v1
       - name: Deploy
         run: |-
           cd part3/3_03
-          echo "postgres username: $POSTGRES_UNAME"
-          echo "postgres pass: $POSTGRES_PASS"
           kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize edit set image gcr.io/PROJECT_ID/FRONTEND_IMAGE=gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kubectl config set-context --current --namespace=todo-app
