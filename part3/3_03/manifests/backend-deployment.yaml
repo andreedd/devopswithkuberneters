@@ -20,6 +20,6 @@ spec:
           args: ["-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
           env:
           - name: POSTGRES_USERNAME
-            value: $(POSTGRES_UNAME)
+            value: ${POSTGRES_UNAME}
           - name: POSTGRES_PASSWORD
-            value: $(POSTGRES_PASS)
+            value: ${POSTGRES_PASS}
