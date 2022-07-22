@@ -34,7 +34,7 @@ jobs:
         run: |-
           docker build \
             --tag "gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
-            app/.
+            part3/3_03/app/.
       - name: Publish Backend
         run: |-
           docker push "gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
@@ -43,7 +43,7 @@ jobs:
         run: |-
           docker build \
             --tag "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
-            v2_frontend/.
+            part3/3_03/v2_frontend/.
       - name: Publish Frontend
         run: |-
           docker push "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
