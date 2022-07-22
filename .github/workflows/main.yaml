@@ -9,8 +9,6 @@ env:
   GKE_ZONE: europe-north1-c
   BACKEND_IMAGE: backend
   FRONTEND_IMAGE: frontend
-  POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
-  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
 jobs:
   build-publish-deploy:
@@ -52,10 +50,13 @@ jobs:
 
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v1
+        env:
+          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       - name: Deploy
         run: |-
           cd part3/3_03
-          echo $POSTGRES_USERNAME
+          echo "secret: $POSTGRES_USERNAME"
           kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize edit set image gcr.io/PROJECT_ID/FRONTEND_IMAGE=gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kubectl config set-context --current --namespace=todo-app
