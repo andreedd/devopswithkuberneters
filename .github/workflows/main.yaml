@@ -9,7 +9,7 @@ env:
   GKE_ZONE: europe-north1-c
   BACKEND_IMAGE: backend
   FRONTEND_IMAGE: frontend
-  SOPS_AGE_KEY_FILE: ${{ secrets.SOPS_KEY_FILE }}
+  SOPS_AGE_KEY: ${{ secrets.SOPS_KEY_FILE }}
 
 jobs:
   build-publish-deploy:
@@ -30,8 +30,10 @@ jobs:
       - name: setup sops
         run: |-
           cd part3/3_03/manifests
-          echo $SOPS_AGE_KEY_FILE > key.txt
+          echo $SOPS_AGE_KEY > key.txt
+          cat key.txt
           export SOPS_AGE_KEY_FILE=$(pwd)/key.txt
+          echo $SOPS_AGE_KEY_FILE
           sops --decrypt secret.enc.yaml > secret.yaml
           cd
 
