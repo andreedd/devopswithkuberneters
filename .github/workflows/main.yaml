@@ -20,20 +20,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Python & sops
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip'
-      - run: pip install sops
+      - name: Setup Go
+        uses: cedrickring/golang-action@1.6.0
       
       - name: setup sops
         run: |-
+          apt update
+          apt install wget
+          wget https://github.com/mozilla/sops/releases/download/v3.7.3/sops_3.7.3_amd64.deb
+          dpkg -i sops_3.7.3_amd64.deb
           cd part3/3_03/manifests
           echo $SOPS_AGE_KEY > key.txt
-          cat key.txt
           export SOPS_AGE_KEY_FILE=$(pwd)/key.txt
-          echo $SOPS_AGE_KEY_FILE
           sops --decrypt secret.enc.yaml > secret.yaml
           cd
 
