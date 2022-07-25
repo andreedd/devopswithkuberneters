@@ -19,9 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Setup Go
-        uses: cedrickring/golang-action@1.6.0
       
       - name: setup sops
         run: |-
