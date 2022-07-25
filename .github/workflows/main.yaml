@@ -20,13 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: ${{ secrets.GKE_PROJECT }}
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          export_default_credentials: true
-
       - name: Setup Python & sops
         uses: actions/setup-python@v4
         with:
@@ -34,6 +27,21 @@ jobs:
           cache: 'pip'
       - run: pip install sops
       
+      - name: setup sops
+        run: |-
+          cd part3/3_03/manifests
+          echo $SOPS_AGE_KEY_FILE > key.txt
+          export SOPS_AGE_KEY_FILE=$(pwd)/key.txt
+          sops --decrypt secret.enc.yaml > secret.yaml
+          cd
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GKE_PROJECT }}
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          export_default_credentials: true
+
       - run: gcloud --quiet auth configure-docker
       - run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
       
@@ -54,12 +62,6 @@ jobs:
       - name: Publish Frontend
         run: |-
           docker push "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
-
-      - name: setup sops
-        run: |-
-          echo $SOPS_AGE_KEY_FILE > key.txt
-          export SOPS_AGE_KEY_FILE=$(pwd)/key.txt
-          sops --decrypt part3/3_03/manifests/secret.enc.yaml > part3/3_03/manifests/secret.yaml
 
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v1
