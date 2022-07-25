@@ -1,0 +1,74 @@
+name: Release application
+
+on:
+  push:
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-c
+  BACKEND_IMAGE: backend
+  FRONTEND_IMAGE: frontend
+  SOPS_AGE_KEY: ${{ secrets.SOPS_KEY_FILE }}
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: setup sops
+        run: |-
+          sudo apt update
+          sudo apt -y install wget
+          sudo wget https://github.com/mozilla/sops/releases/download/v3.7.3/sops_3.7.3_amd64.deb
+          sudo dpkg -i sops_3.7.3_amd64.deb
+          cd part3/3_03/manifests
+          echo $SOPS_AGE_KEY > key.txt
+          export SOPS_AGE_KEY_FILE=$(pwd)/key.txt
+          sops --decrypt secret.enc.yaml > secret.yaml
+          cd
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GKE_PROJECT }}
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          export_default_credentials: true
+
+      - run: gcloud --quiet auth configure-docker
+      - run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+      
+      - name: Build Backend
+        run: |-
+          docker build \
+            --tag "gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
+            part3/3_03/app/.
+      - name: Publish Backend
+        run: |-
+          docker push "gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
+
+      - name: Build Frontend
+        run: |-
+          docker build \
+            --tag "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
+            part3/3_03/v2_frontend/.
+      - name: Publish Frontend
+        run: |-
+          docker push "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v1
+      - name: Deploy
+        run: |-
+          cd part3/3_03
+          kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+          kustomize edit set image gcr.io/PROJECT_ID/FRONTEND_IMAGE=gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+          kubectl config set-context --current --namespace=todo-app
+          kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment todo
+          kubectl rollout status deployment frontend
+          kubectl get services -o wide
