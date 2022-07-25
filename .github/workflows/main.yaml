@@ -27,13 +27,13 @@ jobs:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           export_default_credentials: true
 
-      - name: Sops Binary Installer
-        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+      - name: Setup Python & sops
+      - uses: actions/setup-python@v4
         with:
-          version: '3.7.3' # default is latest stable
-        id: install
+          python-version: '3.9'
+          cache: 'pip'
+      - run: pip install sops
       
-
       - run: gcloud --quiet auth configure-docker
       - run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
       
