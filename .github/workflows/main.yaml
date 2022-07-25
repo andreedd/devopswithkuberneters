@@ -57,6 +57,7 @@ jobs:
 
       - name: setup sops
         run: |-
+          export SOPS_AGE_KEY_FILE=$SOPS_AGE_KEY_FILE
           sops --decrypt part3/3_03/manifests/secret.enc.yaml > part3/3_03/manifests/secret.yaml
 
       - name: Set up Kustomize
