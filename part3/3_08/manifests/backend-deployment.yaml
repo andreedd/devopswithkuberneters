@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: todo-app
+  name: todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+        - name: todo
+          image: PROJECT/BACKEND_IMAGE
+          command: ["/bin/sh"]
+          args: ["-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+          env:
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: POSTGRES_USERNAME
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: POSTGRES_PASSWORD
+          resources:
+            limits:
+              cpu: "350m"
+              memory: "1000Mi"
