@@ -1,0 +1,23 @@
+## 3_06
+DBaaS
+pros
++ required work (fast setup)
++ Less cost to initialize
++ Less to maintain (staff costs)
++ Easy basic usage
++ Security
+
+cons
+- Less customizable
+- Limited to available databases
+
+DIY
+pros
++ Customizable
++ Can use any database
+
+cons
+- Setup time
+- Maintenance costs
+- Security
+- Less user friendly
