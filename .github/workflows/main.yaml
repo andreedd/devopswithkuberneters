@@ -26,7 +26,7 @@ jobs:
           sudo apt -y install wget
           sudo wget https://github.com/mozilla/sops/releases/download/v3.7.3/sops_3.7.3_amd64.deb
           sudo dpkg -i sops_3.7.3_amd64.deb
-          cd part3/3_05/manifests
+          cd part3/3_08/manifests
           echo $SOPS_AGE_KEY > key.txt
           export SOPS_AGE_KEY_FILE=$(pwd)/key.txt
           sops --decrypt secret.enc.yaml > secret.yaml
@@ -54,7 +54,6 @@ jobs:
       - name: Build Frontend
         run: |-
           docker build \
-            --build-arg BACKEND_URL=http://todo-svc.${VARIABLE_NAME} \
             --tag "gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
             part3/3_08/v2_frontend/.
       - name: Publish Frontend
@@ -66,11 +65,9 @@ jobs:
       - name: Deploy
         run: |-
           cd part3/3_08
-          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
-          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
-          kustomize edit set namespace ${GITHUB_REF#refs/heads/}
           kustomize edit set image gcr.io/PROJECT_ID/BACKEND_IMAGE=gcr.io/$PROJECT_ID/$BACKEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize edit set image gcr.io/PROJECT_ID/FRONTEND_IMAGE=gcr.io/$PROJECT_ID/$FRONTEND_IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+          kubectl config set-context --current --namespace=todo-app
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment todo
           kubectl rollout status deployment frontend
