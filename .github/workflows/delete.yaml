@@ -24,6 +24,6 @@ jobs:
           export_default_credentials: true
 
       - run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
-      - name: Delete Namespace
+      - name: delete namespace
         run: |-
-            kubectl delete namespace project-${BRANCH#refs/heads/}
+            kubectl delete namespace ${BRANCH#refs/heads/}
