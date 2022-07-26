@@ -14,3 +14,7 @@ kubectl apply -f app/manifests/
 
 
 gcloud container clusters delete dwk-cluster --zone=europe-north1-c
+
+scaling:
+gcloud container clusters update dwk-cluster --zone=europe-north1-c --enable-autoscaling 
+--min-nodes=1 --max-nodes=5
