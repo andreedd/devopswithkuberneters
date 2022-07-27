@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  namespace: todo-app
+  name: todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  strategy:
+    canary:
+      steps:
+      - setWeight: 25
+      - pause:
+          duration: 30s
+      - setWeight: 50
+      - pause:
+          duration: 30s
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+        - name: todo
+          image: PROJECT/BACKEND_IMAGE
+          command: ["/bin/sh"]
+          args: ["-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+          env:
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: POSTGRES_USERNAME
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: POSTGRES_PASSWORD
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+               path: /todo/todos/
+               port: 8000
+          livenessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            httpGet:
+               path: /todo/todos/
+               port: 8000
