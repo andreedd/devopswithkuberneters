@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlaskApp</title>
+</head>
+<body>
+    <h1>TODOS</h1>
+    <img style="width:500px;height:500px;" src="https://images.unsplash.com/photo-1658239828542-daa29a4cd472?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2354&q=80"/>
+    <form action = "/todos" method = "post">
+      <p>Enter Todo:</p>
+      <p><input type = "text" name = "todo" /></p>
+      <p><input type = "submit" value = "submit" /></p>
+   </form>  
+    <ul>
+      {% for todo in todos %}
+        <li>{{ todo.title }}</li>
+      {% endfor %}
+    </ul>
+</body>
+</html>

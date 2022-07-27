@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - app/manifests/deployment.yaml
+  - app/manifests/ingress.yaml
+  - app/manifests/message-config.yaml
+  - app/manifests/namespaces.yaml
+  - app/manifests/service.yaml
+  - pingpong_app/manifests/deployment.yaml
+  - pingpong_app/manifests/dbservice.yaml
+  - pingpong_app/manifests/secret.yaml
+  - pingpong_app/manifests/service.yaml
+  - pingpong_app/manifests/statefulset.yaml
