@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: todo-app
+  name: broadcast
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: broadcast
+  template:
+    metadata:
+      labels:
+        app: broadcast
+    spec:
+      containers:
+        - name: broadcast
+          image: PROJECT/BROADCAST_IMAGE
+          env:
+          - name: WEBHOOK_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets
+                key: WEBHOOK_URL
+          - name: NATS_URL
+            value: nats://my-nats:4222

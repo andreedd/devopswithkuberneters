@@ -1,0 +1,41 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  nats:
+    container_name: nats-main
+    image: 'nats'
+    expose:
+      - "4222"
+    ports:
+      - "8222:8222"
+      - "6222:6222"
+      - "4222:4222"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  todo:
+    build: .
+    restart: always
+    ports: 
+      - 8005:8000
+    command: bash -c " python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+     - db
+    environment:
+      DB_HOST: db
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: example
+      NATS_URL: nats://nats:4222

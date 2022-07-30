@@ -1,0 +1,26 @@
+k3d cluster create --port 8082:30080@agent:0 -p 8081:80@loadbalancer --agents 2
+
+kubectl create namespace log-app
+
+kubectl create namespace todo-app
+
+kubectl config set-context --current --namespace=todo-app
+
+kubectl create namespace prometheus
+
+helm install prometheus-community/kube-prometheus-stack --generate-name --namespace prometheus
+
+helm install my-nats nats/nats
+
+kubectl port-forward my-nats-0 7777:7777 
+in http://127.0.0.1:7777/metrics
+
+kubectl -n prometheus get prometheus
+kubectl describe prometheus -n prometheus kube-prometheus-stack-16xx-prometheus
+
+kubectl -n prometheus port-forward prometheus-kube-prometheus-stack-16xx-prometheus-0 9090
+
+curl 'http://localhost:9090/api/v1/query?query=nats_varz_cpu'
+
+kubectl -n prometheus port-forward kube-prometheus-stack-1602180058-grafana-59cd48d794-4459m 3000
+
