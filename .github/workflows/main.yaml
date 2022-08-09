@@ -3,7 +3,7 @@ name: Release DWK Project
 on:
   push:
     branches:
-      - master
+      - none
     paths:
       - 'part4/4_08/**'
       - '.github/workflows/main.yml'

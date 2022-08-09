@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: pingpong
+  namespace: ping
+spec:
+  template:
+    metadata:
+      name: pingpong-dwk-v1
+    spec:
+      containers:
+        - image: ddeeh/pingpong
