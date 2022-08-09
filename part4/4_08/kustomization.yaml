@@ -18,10 +18,10 @@ resources:
 images:
 - name: PROJECT/BACKEND_IMAGE
   newName: ddeeh/k8s_todo
-  newTag: 905c696abb4110d048660dac1b7a5a97a01cd666
+  newTag: 2d67dc4297b05f9fd1ebc0a986daaa8232c5a334
 - name: PROJECT/BROADCAST_IMAGE
   newName: ddeeh/k8s_broadcaster
-  newTag: 905c696abb4110d048660dac1b7a5a97a01cd666
+  newTag: 2d67dc4297b05f9fd1ebc0a986daaa8232c5a334
 - name: PROJECT/FRONTEND_IMAGE
   newName: ddeeh/k8s_frontend
-  newTag: 905c696abb4110d048660dac1b7a5a97a01cd666
+  newTag: 2d67dc4297b05f9fd1ebc0a986daaa8232c5a334
