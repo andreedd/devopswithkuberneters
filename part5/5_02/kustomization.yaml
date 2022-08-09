@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+  #- manifests/backend-rollout.yaml
+  #- manifests/analysistemplate.yaml
+resources:
+- manifests/backend-deployment.yaml
+- manifests/backend-service.yaml
+- manifests/frontend-deployment.yaml
+- manifests/frontend-service.yaml
+- manifests/broadcast-deployment.yaml
+- manifests/dbservice.yaml
+- manifests/ingress.yaml
+- manifests/namespaces.yaml
+- manifests/statefulset.yaml
+- manifests/todojob.yaml
+- manifests/secret.yaml
+- manifests/servicemonitor.yaml
+images:
+- name: PROJECT/BACKEND_IMAGE
+  newName: ddeeh/k8s_todo
+  newTag: 905c696abb4110d048660dac1b7a5a97a01cd666
+- name: PROJECT/BROADCAST_IMAGE
+  newName: ddeeh/k8s_broadcaster
+  newTag: 905c696abb4110d048660dac1b7a5a97a01cd666
+- name: PROJECT/FRONTEND_IMAGE
+  newName: ddeeh/k8s_frontend
+  newTag: 905c696abb4110d048660dac1b7a5a97a01cd666

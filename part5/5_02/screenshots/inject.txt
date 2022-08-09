@@ -1,0 +1,300 @@
+ ~/d/dw/k8s_course/part5/5_02  master ?1  kubectl get -n todo-app deploy -o yaml \
+    | linkerd inject -
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: my-nats
+      meta.helm.sh/release-namespace: todo-app
+    generation: 1
+    labels:
+      app: my-nats-box
+      app.kubernetes.io/managed-by: Helm
+      chart: nats-0.17.3
+    name: my-nats-box
+    namespace: todo-app
+    resourceVersion: "3366"
+    uid: c20cedd5-1b9e-4aee-b31b-0896a7484bf3
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: my-nats-box
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          linkerd.io/inject: enabled
+        labels:
+          app: my-nats-box
+      spec:
+        containers:
+        - command:
+          - tail
+          - -f
+          - /dev/null
+          env:
+          - name: NATS_URL
+            value: my-nats
+          image: natsio/nats-box:0.11.0
+          imagePullPolicy: IfNotPresent
+          name: nats-box
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - message: ReplicaSet "my-nats-box-68588f68c5" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"broadcast","namespace":"todo-app"},"spec":{"replicas":6,"selector":{"matchLabels":{"app":"broadcast"}},"template":{"metadata":{"labels":{"app":"broadcast"}},"spec":{"containers":[{"env":[{"name":"WEBHOOK_URL","valueFrom":{"secretKeyRef":{"key":"WEBHOOK_URL","name":"postgres-secrets"}}},{"name":"NATS_URL","value":"nats://my-nats:4222"}],"image":"ddeeh/k8s_broadcaster:905c696abb4110d048660dac1b7a5a97a01cd666","name":"broadcast"}]}}}}
+    generation: 1
+    name: broadcast
+    namespace: todo-app
+    resourceVersion: "3838"
+    uid: 4b0e12f8-8aee-41c9-a834-102ef26cafe9
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 6
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: broadcast
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          linkerd.io/inject: enabled
+        labels:
+          app: broadcast
+      spec:
+        containers:
+        - env:
+          - name: WEBHOOK_URL
+            valueFrom:
+              secretKeyRef:
+                key: WEBHOOK_URL
+                name: postgres-secrets
+          - name: NATS_URL
+            value: nats://my-nats:4222
+          image: ddeeh/k8s_broadcaster:905c696abb4110d048660dac1b7a5a97a01cd666
+          imagePullPolicy: IfNotPresent
+          name: broadcast
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 6
+    conditions:
+    - message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - message: ReplicaSet "broadcast-577ff55699" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 6
+    replicas: 6
+    updatedReplicas: 6
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"todo","namespace":"todo-app"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"todo"}},"template":{"metadata":{"labels":{"app":"todo"}},"spec":{"containers":[{"args":["-c","python manage.py migrate \u0026\u0026 python manage.py runserver 0.0.0.0:8000"],"command":["/bin/sh"],"env":[{"name":"POSTGRES_USERNAME","valueFrom":{"secretKeyRef":{"key":"POSTGRES_USERNAME","name":"postgres-secrets"}}},{"name":"POSTGRES_PASSWORD","valueFrom":{"secretKeyRef":{"key":"POSTGRES_PASSWORD","name":"postgres-secrets"}}},{"name":"NATS_URL","value":"nats://my-nats:4222"}],"image":"ddeeh/k8s_todo:905c696abb4110d048660dac1b7a5a97a01cd666","name":"todo"}]}}}}
+    generation: 1
+    name: todo
+    namespace: todo-app
+    resourceVersion: "3847"
+    uid: 336ea1db-6f84-44ad-bcd7-d0f5e38169a8
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: todo
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          linkerd.io/inject: enabled
+        labels:
+          app: todo
+      spec:
+        containers:
+        - args:
+          - -c
+          - python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+          command:
+          - /bin/sh
+          env:
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USERNAME
+                name: postgres-secrets
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: postgres-secrets
+          - name: NATS_URL
+            value: nats://my-nats:4222
+          image: ddeeh/k8s_todo:905c696abb4110d048660dac1b7a5a97a01cd666
+          imagePullPolicy: IfNotPresent
+          name: todo
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - message: ReplicaSet "todo-7748855f99" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"frontend","namespace":"todo-app"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"frontend"}},"template":{"metadata":{"labels":{"app":"frontend"}},"spec":{"containers":[{"env":[{"name":"BACKEND_URL","value":"http://todo-svc.todo-app"}],"image":"ddeeh/k8s_frontend:905c696abb4110d048660dac1b7a5a97a01cd666","livenessProbe":{"httpGet":{"path":"/todos","port":5000},"initialDelaySeconds":20,"periodSeconds":5},"name":"frontend","readinessProbe":{"httpGet":{"path":"/todos","port":5000},"initialDelaySeconds":10,"periodSeconds":5}}]}}}}
+    generation: 1
+    name: frontend
+    namespace: todo-app
+    resourceVersion: "3856"
+    uid: ee0c93e3-4fb0-4b63-8ad7-aafec59578f5
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: frontend
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          linkerd.io/inject: enabled
+        labels:
+          app: frontend
+      spec:
+        containers:
+        - env:
+          - name: BACKEND_URL
+            value: http://todo-svc.todo-app
+          image: ddeeh/k8s_frontend:905c696abb4110d048660dac1b7a5a97a01cd666
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /todos
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /todos
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - message: ReplicaSet "frontend-86586cd7c9" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata: {}
+---
+
+deployment "my-nats-box" injected
+deployment "broadcast" injected
+deployment "todo" injected
+deployment "frontend" injected
